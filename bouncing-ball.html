@@ -71,8 +71,8 @@
         execute(delta, time) {
           // Iterate through all the entities on the query
           this.queries.moving.results.forEach(entity => {
-            var velocity = entity.getMutableComponent(Velocity);
-            var position = entity.getMutableComponent(Position);
+            const velocity = entity.getMutableComponent(Velocity);
+            const position = entity.getMutableComponent(Position);
             position.x += velocity.x * delta;
             position.y += velocity.y * delta;
 
@@ -106,27 +106,25 @@
         execute(delta, time) {
           ctx.globalAlpha = 1;
           ctx.fillStyle = "#fff";
-          ctx.fillRect(0, 0, canvasWidth, canvasHeight); // clear the canvas
+          ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
           // Iterate through all the entities on the query
           this.queries.renderables.results.forEach(entity => {
-            var position = entity.getComponent(Position);
-            this.drawCircle(position);
+            const position = entity.getComponent(Position);
+            
+						// draw circle
+						ctx.fillStyle = "#000";
+						ctx.beginPath();
+						ctx.arc(
+							position.x,
+							position.y,
+							BALL_HALF_SIZE,
+							0,
+							2 * Math.PI,
+							false
+						);
+						ctx.fill();
           });
-        }
-
-        drawCircle(position) {
-          ctx.fillStyle = "#000";
-          ctx.beginPath();
-          ctx.arc(
-            position.x,
-            position.y,
-            BALL_HALF_SIZE,
-            0,
-            2 * Math.PI,
-            false
-          );
-          ctx.fill();
         }
       }
 
@@ -136,7 +134,7 @@
       };
 
       // Create world and register the systems on it
-      var world = new World();
+      const world = new World();
 
       world.registerSystem(MovableSystem).registerSystem(RendererSystem);
 
@@ -165,8 +163,8 @@
       // Run!
       function run() {
         // Compute delta and elapsed time
-        var time = performance.now();
-        var delta = time - lastTime;
+        const time = performance.now();
+        const delta = time - lastTime;
 
         // Run all the systems
         world.execute(delta, time);
@@ -175,7 +173,7 @@
         requestAnimationFrame(run);
       }
 
-      var lastTime = performance.now();
+      let lastTime = performance.now();
       run();
     </script>
     <canvas></canvas>

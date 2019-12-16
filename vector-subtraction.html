@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Vector Subtraction</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="content-frame-styles.css" />
+  </head>
+  <body>
+    <script type="module">
+      import {
+        World,
+        System,
+        TagComponent
+      } from "//unpkg.com/ecsy@0.2.1/build/ecsy.module.js";
+
+      import Vector from "./vector.module.js";
+
+      // Initialize canvas
+      let canvas = document.querySelector("canvas");
+      let canvasWidth = (canvas.width = window.innerWidth);
+      let canvasHeight = (canvas.height = window.innerHeight);
+      let ctx = canvas.getContext("2d");
+
+      window.addEventListener(
+        "resize",
+        () => {
+          canvasWidth = canvas.width = window.innerWidth;
+          canvasHeight = canvas.height = window.innerHeight;
+        },
+        false
+      );
+
+      let mouseX, mouseY;
+
+      window.addEventListener("mousemove", e => {
+        mouseX = e.offsetX;
+        mouseY = e.offsetY;
+      });
+
+      //----------------------
+      // Components
+      //----------------------
+
+      // Position component
+      class Position {
+        constructor() {
+          this.x = this.y = 0;
+        }
+      }
+
+      // Line component
+      class Line {
+        constructor() {}
+      }
+
+      // Renderable component
+      class Renderable extends TagComponent {}
+
+      //----------------------
+      // Systems
+      //----------------------
+
+      // RendererSystem
+      class RendererSystem extends System {
+        // This method will get called on every frame by default
+        execute(delta, time) {
+          ctx.globalAlpha = 1;
+          ctx.fillStyle = "#fff";
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+          // Iterate through all the entities on the query
+          this.queries.renderables.results.forEach(entity => {
+            const mouse = new Vector(mouseX, mouseY);
+            const center = new Vector(canvasWidth / 2, canvasHeight / 2);
+            mouse.sub(center);
+            ctx.translate(center.x, center.y);
+            ctx.strokeStyle = "#000";
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.stroke();
+          });
+        }
+      }
+
+      // Define a query of entities that have "Renderable" and "Line" components
+      RendererSystem.queries = {
+        renderables: { components: [Renderable, Line] }
+      };
+
+      // Create world and register the systems on it
+      const world = new World();
+
+      world.registerSystem(RendererSystem);
+
+      world
+        .createEntity()
+        .addComponent(Line)
+        .addComponent(Renderable);
+
+      // Run!
+      function run() {
+        // Compute delta and elapsed time
+        const time = performance.now();
+        const delta = time - lastTime;
+
+        // Run all the systems
+        world.execute(delta, time);
+
+        lastTime = time;
+        requestAnimationFrame(run);
+      }
+
+      let lastTime = performance.now();
+      run();
+    </script>
+    <canvas></canvas>
+  </body>
+</html>
