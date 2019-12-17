@@ -80,6 +80,7 @@
             const center = new Vector(canvasWidth / 2, canvasHeight / 2);
             const mouse = new Vector(mouseX, mouseY);            
             mouse.sub(center);
+            mouse.mult(0.5);
             ctx.translate(center.x, center.y);
             ctx.strokeStyle = line.color;
             ctx.lineWidth = line.thickness;

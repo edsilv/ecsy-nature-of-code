@@ -16,10 +16,6 @@
         TagComponent
       } from "//unpkg.com/ecsy@0.2.1/build/ecsy.module.js";
 
-      const SPEED_MULTIPLIER = 0.5;
-      const BALL_SIZE = 60;
-      const BALL_HALF_SIZE = BALL_SIZE / 2;
-
       // Initialize canvas
       let canvas = document.querySelector("canvas");
       let canvasWidth = (canvas.width = window.innerWidth);
@@ -55,7 +51,10 @@
 
       // Ball component
       class Ball {
-        constructor() {}
+        constructor() {
+          this.color = "#000";
+          this.radius = 30;
+        }
       }
 
       // Renderable component
@@ -73,19 +72,21 @@
           this.queries.moving.results.forEach(entity => {
             const velocity = entity.getMutableComponent(Velocity);
             const position = entity.getMutableComponent(Position);
+            const ball = entity.getMutableComponent(Ball);
+
             position.x += velocity.x * delta;
             position.y += velocity.y * delta;
 
             if (
-              position.x + BALL_HALF_SIZE > canvasWidth ||
-              position.x < 0 + BALL_HALF_SIZE
+              position.x + ball.radius > canvasWidth ||
+              position.x < 0 + ball.radius
             ) {
               velocity.x = velocity.x * -1;
             }
 
             if (
-              position.y + BALL_HALF_SIZE > canvasHeight ||
-              position.y < 0 + BALL_HALF_SIZE
+              position.y + ball.radius > canvasHeight ||
+              position.y < 0 + ball.radius
             ) {
               velocity.y = velocity.y * -1;
             }
@@ -96,7 +97,7 @@
       // Define a query of entities that have "Velocity" and "Position" components
       MovableSystem.queries = {
         moving: {
-          components: [Velocity, Position]
+          components: [Velocity, Position, Ball]
         }
       };
 
@@ -111,6 +112,7 @@
           // Iterate through all the entities on the query
           this.queries.renderables.results.forEach(entity => {
             const position = entity.getComponent(Position);
+            const ball = entity.getMutableComponent(Ball);
             
 						// draw circle
 						ctx.fillStyle = "#000";
@@ -118,7 +120,7 @@
 						ctx.arc(
 							position.x,
 							position.y,
-							BALL_HALF_SIZE,
+							ball.radius,
 							0,
 							2 * Math.PI,
 							false
@@ -141,8 +143,8 @@
       // Some helper functions when creating the components
       function getRandomVelocity() {
         return {
-          x: SPEED_MULTIPLIER * (2 * Math.random() - 1),
-          y: SPEED_MULTIPLIER * (2 * Math.random() - 1)
+          x: 0.5 * (2 * Math.random() - 1),
+          y: 0.5 * (2 * Math.random() - 1)
         };
       }
 
