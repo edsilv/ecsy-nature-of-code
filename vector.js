@@ -67,7 +67,7 @@ class Vector {
 
   normalize() {
     var m = this.mag();
-    if (m != 0 && m != 1) {
+    if (m !== 0 && m !== 1) {
       this.div(m);
     }
   }
